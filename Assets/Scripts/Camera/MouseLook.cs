@@ -20,6 +20,10 @@ public class MouseLook : MonoBehaviour
 
     void Update()
     {
+        // close the game
+        if (Input.GetKeyDown(KeyCode.Escape))
+            Application.Quit();
+
         #region ROTATION
 
         float mouseX = Input.GetAxis("Mouse X");
