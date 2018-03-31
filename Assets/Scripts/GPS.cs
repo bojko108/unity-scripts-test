@@ -3,14 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using Import;
+
 public class GPS : MonoBehaviour
 {
     public static GPS Instance { get; set; }
-
+    
     [Tooltip("Set accuracy for GPS coordinates update in meters")]
-    public float DesiredAccuracy = 100f;
+    public float DesiredAccuracy = 10f;
     [Tooltip("Set the update distance for GPS results in meters")]
     public float UpdateDistance = 1f;
+
+    public Vertex Location;
 
     public float Latitude;
     public float Longitude;
@@ -23,6 +27,21 @@ public class GPS : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         StartCoroutine(this.StartLocationService());
+    }
+
+    private void Update()
+    {
+        this.updateLocation(Input.location.lastData);
+    }
+
+    private void updateLocation(LocationInfo locationData)
+    {
+        this.Latitude = locationData.latitude;
+        this.Longitude = locationData.longitude;
+        this.Altitude = locationData.altitude;
+
+        this.Location = new Vertex(this.Latitude, this.Longitude, this.Altitude);
+        this.Location.ProjectToWebMercator();
     }
 
     private IEnumerator StartLocationService()
@@ -53,7 +72,7 @@ public class GPS : MonoBehaviour
         {
             yield break;
         }
-
+        
         #endregion
 
         this.Latitude = Input.location.lastData.latitude;

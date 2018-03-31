@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using System.Linq;
 
 using Import.GeoJSON;
+using Import;
 
 public class ImportGeoJSON : ScriptableWizard
 {
@@ -16,6 +18,12 @@ public class ImportGeoJSON : ScriptableWizard
     public string ParentName = "Map data";
     [Tooltip("Material to use for game objects")]
     public string MaterialName = "Red";
+
+    public bool Extrude = false;
+    public string ExtrudeField;
+    public float ExtrudeFactor;
+    [Tooltip("If the faces are not visible toggle this parameter")]
+    public bool InvertFaces;
 
     [MenuItem("GIS Tools/Import GeoJSON data")]
     private static void CreateWizard()
@@ -34,10 +42,40 @@ public class ImportGeoJSON : ScriptableWizard
         try
         {
             FeatureCollection features = GeoJSONObject.Deserialize(this.GeoJSONSource.text);
-            
-            foreach(FeatureObject feature in features.features)
+
+            MapBounds bounds = features.bbox;
+            //bounds.ProjectToWebMercator();
+            bounds.SetScale(this.Scale);
+
+            foreach (FeatureObject ftr in features.features)
             {
-                Debug.Log(feature.type);
+                MapFeature feature = new MapFeature(ftr.properties["osm_id"]);
+
+                List<Vertex> vertices = ftr.geometry.AllPositions().ConvertAll((v) => new Vertex(v.latitude, v.longitude, 0.0));
+
+                feature.SetGeometry(EnumGeometryType.Polygon, vertices);
+
+                if (feature.Geometry.IsEmpty) continue;
+
+                //feature.Geometry.ProjectToWebMercator();
+                feature.Geometry.SetScale(this.Scale);
+
+                Vector3 cityOrigin = feature.Geometry.GetCentroid();
+
+                GameObject go = feature.ToGameObject();
+                go.transform.position = cityOrigin - bounds.Center.ToVector3();
+                go.transform.parent = parentGameObject.transform;
+
+                Material material = new Material(Shader.Find("Standard"));
+                material.color = UnityEngine.Random.ColorHSV();
+                go.GetComponent<Renderer>().material = material;
+
+                if (this.Extrude)
+                {
+                    // TODO: get extrusion values from a field....
+                    // TODO: use this.ExtrusionFactor
+                    MeshExtrusion.Extrude(go, UnityEngine.Random.Range(1, 500), this.InvertFaces);
+                }
             }
         }
         catch (Exception ex)

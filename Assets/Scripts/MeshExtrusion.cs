@@ -51,7 +51,8 @@ public class MeshExtrusion
             Vector3 targetPosition = currentPosition;
             targetPosition.y += extrusion;
 
-            Quaternion direction = Quaternion.LookRotation(gameObject.transform.forward, gameObject.transform.up);
+            //Quaternion direction = Quaternion.LookRotation(gameObject.transform.forward, gameObject.transform.up);
+            Quaternion direction = Quaternion.identity; // no rotation
 
             Matrix4x4 worldToLocal = gameObject.transform.worldToLocalMatrix;
 
