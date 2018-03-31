@@ -6,10 +6,12 @@ using Import;
 
 public class MobileLook : MonoBehaviour
 {
-    private bool gyroscopeEnabled;
-    private Gyroscope gyroscope;
+    public Vector3 Origin;
+    public float Scale;
 
     private GPS gps;
+    private bool gyroscopeEnabled;
+    private Gyroscope gyroscope;
 
     private GameObject cameraContainer;
 
@@ -50,8 +52,12 @@ public class MobileLook : MonoBehaviour
         #region UPDATE CAMERA POSITION
 
         Vertex currentLocation = this.gps.Location;
+        currentLocation.Scale(this.Scale);
+        Vector3 currentLocationVector = currentLocation.ToVector3();
 
-        this.cameraContainer.transform.position = currentLocation.ReduceToVector3(this.cameraContainer.transform.position);
+        // Y (height) will be equal to GPS height
+        //TODO: add VeticalScale property for heights, simmilar for current property Scale
+        this.cameraContainer.transform.position = new Vector3(currentLocationVector.x - this.Origin.x, currentLocationVector.y - 500, currentLocationVector.z - this.Origin.z);
 
         #endregion
     }
@@ -60,17 +66,14 @@ public class MobileLook : MonoBehaviour
     {
         GUI.skin.label.fontSize = Screen.width / 40;
 
-        GUILayout.Label("Latitude: " + GPS.Instance.Latitude.ToString());
-        GUILayout.Label("Longitude: " + GPS.Instance.Longitude.ToString());
-        GUILayout.Label("Altitude: " + GPS.Instance.Altitude.ToString());
-        GUILayout.Label("Northing: " + GPS.Instance.Location.Northing.ToString());
-        GUILayout.Label("Easting: " + GPS.Instance.Location.Easting.ToString());
-        GUILayout.Label("---------------------------------");
+        GUILayout.Label("Origin position: " + this.Origin);
+        GUILayout.Label("GPS position: " + this.gps.Location.ToVector3());
         GUILayout.Label("Camera position: " + this.cameraContainer.transform.position);
-        
+
         if (this.gyroscopeEnabled)
         {
             GUILayout.Label("---------------------------------");
+            GUILayout.Label("Input.gyro.enabled: " + this.gyroscope.enabled);
             GUILayout.Label("Input.gyro.attitude: " + this.gyroscope.attitude);
             GUILayout.Label("Input.gyro.rotationRate: " + this.gyroscope.rotationRate);
             GUILayout.Label("Input.gyro.rotationRateUnbiased: " + this.gyroscope.rotationRateUnbiased);
@@ -82,6 +85,7 @@ public class MobileLook : MonoBehaviour
         if (SystemInfo.supportsGyroscope)
         {
             this.gyroscope = Input.gyro;
+            this.gyroscope.enabled = false;
             this.gyroscope.enabled = true;
 
             return true;

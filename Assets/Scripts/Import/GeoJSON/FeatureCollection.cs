@@ -58,6 +58,16 @@ namespace Import.GeoJSON
                 bounds.Add(bboxObject.f);
             }
 
+            // if no elevation data
+            if (bounds.Count == 4)
+            {
+                Vertex lowerLeft = new Vertex(bounds[1], bounds[0], 0);
+                Vertex upperRight = new Vertex(bounds[3], bounds[2], 0);
+
+                bbox.LowerLeft = lowerLeft;
+                bbox.UpperRight = upperRight;
+            }
+
             if (bounds.Count == 6)
             {
                 Vertex lowerLeft = new Vertex(bounds[1], bounds[0], bounds[2]);

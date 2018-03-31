@@ -26,6 +26,8 @@ public class GPS : MonoBehaviour
         // do not destroy this object when changing the scene...
         DontDestroyOnLoad(gameObject);
 
+        this.Location = new Vertex(0, 0, 0);
+
         StartCoroutine(this.StartLocationService());
     }
 

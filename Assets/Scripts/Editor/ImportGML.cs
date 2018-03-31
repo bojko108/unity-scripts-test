@@ -48,6 +48,8 @@ public class ImportGML : ScriptableWizard
             bounds.ProjectToWebMercator();
             bounds.SetScale(this.Scale);
 
+            this.UpdateCameraParameters(bounds.Center.ToVector3(), this.Scale);
+
             foreach (MapFeature feature in gmlReader.Features)
             {
                 if (feature.Geometry.IsEmpty) continue;
@@ -58,7 +60,7 @@ public class ImportGML : ScriptableWizard
 
                 // calculate object's centroid
                 Vector3 cityOrigin = feature.Geometry.GetCentroid();
-                
+
                 GameObject go = feature.ToGameObject();
                 go.transform.position = cityOrigin - bounds.Center.ToVector3();
                 go.transform.parent = parentGameObject.transform;
@@ -78,6 +80,18 @@ public class ImportGML : ScriptableWizard
         catch (Exception ex)
         {
             Debug.Log(ex);
+        }
+    }
+
+    private void UpdateCameraParameters(Vector3 origin, float scale)
+    {
+        GameObject camera = GameObject.FindGameObjectWithTag("MainCamera") as GameObject;
+
+        if (camera)
+        {
+            MobileLook mobileLook = camera.GetComponent<MobileLook>() as MobileLook;
+            mobileLook.Origin = origin;
+            mobileLook.Scale = scale;
         }
     }
 }

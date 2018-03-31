@@ -18,6 +18,8 @@ public class ImportGeoJSON : ScriptableWizard
     public string ParentName = "Map data";
     [Tooltip("Material to use for game objects")]
     public string MaterialName = "Red";
+    [Tooltip("Set ObjectID field name")]
+    public string ObjectIDFieldName = "OBJECTID";
 
     public bool Extrude = false;
     public string ExtrudeField;
@@ -44,12 +46,14 @@ public class ImportGeoJSON : ScriptableWizard
             FeatureCollection features = GeoJSONObject.Deserialize(this.GeoJSONSource.text);
 
             MapBounds bounds = features.bbox;
-            //bounds.ProjectToWebMercator();
+            bounds.ProjectToWebMercator();
             bounds.SetScale(this.Scale);
+
+            this.UpdateCameraParameters(bounds.Center.ToVector3(), this.Scale);
 
             foreach (FeatureObject ftr in features.features)
             {
-                MapFeature feature = new MapFeature(ftr.properties["osm_id"]);
+                MapFeature feature = new MapFeature(ftr.properties[this.ObjectIDFieldName]);
 
                 List<Vertex> vertices = ftr.geometry.AllPositions().ConvertAll((v) => new Vertex(v.latitude, v.longitude, 0.0));
 
@@ -57,7 +61,7 @@ public class ImportGeoJSON : ScriptableWizard
 
                 if (feature.Geometry.IsEmpty) continue;
 
-                //feature.Geometry.ProjectToWebMercator();
+                feature.Geometry.ProjectToWebMercator();
                 feature.Geometry.SetScale(this.Scale);
 
                 Vector3 cityOrigin = feature.Geometry.GetCentroid();
@@ -81,6 +85,18 @@ public class ImportGeoJSON : ScriptableWizard
         catch (Exception ex)
         {
             Debug.Log(ex);
+        }
+    }
+
+    private void UpdateCameraParameters(Vector3 origin, float scale)
+    {
+        GameObject camera = GameObject.FindGameObjectWithTag("MainCamera") as GameObject;
+
+        if (camera)
+        {
+            MobileLook mobileLook = camera.GetComponent<MobileLook>() as MobileLook;
+            mobileLook.Origin = origin;
+            mobileLook.Scale = scale;
         }
     }
 }

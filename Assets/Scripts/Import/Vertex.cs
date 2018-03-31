@@ -71,7 +71,7 @@ namespace Import
         /// Convert the Vertex to a new Vector3. Unity uses different coordinate system
         /// so the coordinates are as follows:
         /// Longitude (X) = X (Unity)
-        /// Latutude (Y) = Z (Unity)
+        /// Latitude (Y) = Z (Unity)
         /// Elevation = Y (Unity)
         /// </summary>
         /// <returns>new Vector3(this)</returns>
