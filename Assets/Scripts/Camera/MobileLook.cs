@@ -6,14 +6,12 @@ using Import;
 
 public class MobileLook : MonoBehaviour
 {
-    public Vector3 Origin;
-    public float Scale;
-
     private GPS gps;
     private bool gyroscopeEnabled;
     private Gyroscope gyroscope;
 
     private GameObject cameraContainer;
+    private MapProperties mapProperties;
 
     private void Start()
     {
@@ -23,6 +21,8 @@ public class MobileLook : MonoBehaviour
 
         // add GPS script
         this.gps = this.cameraContainer.AddComponent<GPS>();
+        // get Map Properties: scale and origin...
+        this.mapProperties = this.GetComponent<MapProperties>() as MapProperties;
 
         // set initial rotation
         this.cameraContainer.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
@@ -35,7 +35,12 @@ public class MobileLook : MonoBehaviour
         #region CLOSE GAME
 
         if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            this.gps.Stop();
+
             Application.Quit();
+        }
+            
 
         #endregion
 
@@ -52,12 +57,12 @@ public class MobileLook : MonoBehaviour
         #region UPDATE CAMERA POSITION
 
         Vertex currentLocation = this.gps.Location;
-        currentLocation.Scale(this.Scale);
+        currentLocation.Scale(this.mapProperties.HorizontalScale);
         Vector3 currentLocationVector = currentLocation.ToVector3();
 
         // Y (height) will be equal to GPS height
         //TODO: add VeticalScale property for heights, simmilar for current property Scale
-        this.cameraContainer.transform.position = new Vector3(currentLocationVector.x - this.Origin.x, 1.8f/*currentLocationVector.y*/, currentLocationVector.z - this.Origin.z);
+        this.cameraContainer.transform.position = new Vector3(currentLocationVector.x - this.mapProperties.Origin.x, 1.8f/*currentLocationVector.y*/, currentLocationVector.z - this.mapProperties.Origin.z);
 
         #endregion
     }
@@ -66,9 +71,11 @@ public class MobileLook : MonoBehaviour
     {
         GUI.skin.label.fontSize = Screen.width / 40;
 
-        GUILayout.Label("Origin position: " + this.Origin);
+        GUILayout.Label("Origin position: " + this.mapProperties.Origin);
         GUILayout.Label("GPS position: " + this.gps.Location.ToVector3());
-        GUILayout.Label("Camera position: " + this.cameraContainer.transform.position);
+        GUILayout.Label("Horizontal accuracy: " + this.gps.HorizontalAccuracy);
+        GUILayout.Label("Vertical accuracy: " + this.gps.VerticalAccuracy);
+        GUILayout.Label("Camera position: " + this.cameraContainer.transform.position);        
 
         if (this.gyroscopeEnabled)
         {

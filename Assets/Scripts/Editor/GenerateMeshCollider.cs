@@ -11,7 +11,7 @@ public class GenerateMeshCollider : ScriptableWizard
     [MenuItem("Tools/Generate Mesh Collider")]
     private static void CreateWizard()
     {
-        ScriptableWizard.DisplayWizard<GenerateMeshCollider>("Generate a Mesh collider from all children", "Generate");
+        ScriptableWizard.DisplayWizard<GenerateMeshCollider>("Generate Mesh collider from all children", "Generate");
     }
 
     private void OnWizardCreate()

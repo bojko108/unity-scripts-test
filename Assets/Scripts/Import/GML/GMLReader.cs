@@ -72,7 +72,7 @@ namespace Import.GML
 
                     int dimension = this.GetAttribute<int>("srsDimension", featureNode.SelectSingleNode("ogr:geometryProperty/gml:Polygon/gml:exterior/gml:LinearRing/gml:posList", GMLNamespaces).Attributes);
                     string geometry = featureNode.SelectSingleNode("ogr:geometryProperty/gml:Polygon/gml:exterior/gml:LinearRing/gml:posList", GMLNamespaces).ChildNodes[0].Value;
-                    
+
                     List<Vertex> verticesList = new List<Vertex>();
                     string[] vertices = geometry.Split(new char[] { ' ' });
 
@@ -100,16 +100,16 @@ namespace Import.GML
                             }
                         default: break;
                     }
-                    
+
                     MapFeature feature = new MapFeature(fid);
                     feature.SetGeometry(EnumGeometryType.Polygon, verticesList);
-                    
+
                     this.Features.Add(feature);
                 }
 
                 #endregion
             }
-            catch (Exception ex)
+            catch
             {
 
             }

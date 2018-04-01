@@ -15,10 +15,12 @@ public class GPS : MonoBehaviour
     public float UpdateDistance = 1f;
 
     public Vertex Location;
-
+        
     public float Latitude;
     public float Longitude;
     public float Altitude;
+    public float HorizontalAccuracy;
+    public float VerticalAccuracy;
 
     private void Start()
     {
@@ -33,14 +35,16 @@ public class GPS : MonoBehaviour
 
     private void Update()
     {
-        this.updateLocation(Input.location.lastData);
+        this.UpdateLocation(Input.location.lastData);
     }
 
-    private void updateLocation(LocationInfo locationData)
+    private void UpdateLocation(LocationInfo locationData)
     {
         this.Latitude = locationData.latitude;
         this.Longitude = locationData.longitude;
         this.Altitude = locationData.altitude;
+        this.HorizontalAccuracy = locationData.horizontalAccuracy;
+        this.VerticalAccuracy = locationData.verticalAccuracy;
 
         this.Location = new Vertex(this.Latitude, this.Longitude, this.Altitude);
         this.Location.ProjectToWebMercator();
@@ -82,5 +86,10 @@ public class GPS : MonoBehaviour
         this.Altitude = Input.location.lastData.altitude;
 
         yield break;
+    }
+
+    public void Stop()
+    {
+        Input.location.Stop();
     }
 }

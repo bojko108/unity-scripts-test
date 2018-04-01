@@ -12,20 +12,20 @@ public class ImportGeoJSON : ScriptableWizard
 {
     [Tooltip("Select the file you want to import from.")]
     public TextAsset GeoJSONSource;
-    [Tooltip("Set the scale for imported data. By default the scale is 1:1, if you need for example scale 1:1000, set 1000 for Scale value.")]
-    public float Scale = 1f;
+    [Tooltip("Set the horizotnal scale for imported data. By default the horizotnal scale is 1:1, if you need for example scale 1:1000, set this parameter to 1000.")]
+    public float HorizontalScale = 1f;
+    [Tooltip("Set the vertical scale for imported data. By default the scale is 1:1, if you need for example scale 1:10, set this parameter to 10.")]
+    public float VerticalScale = 1f;
     [Tooltip("Set the name of the parent GameObject")]
     public string ParentName = "Map data";
-    [Tooltip("Material to use for game objects")]
-    public string MaterialName = "Red";
-    [Tooltip("Set ObjectID field name")]
+    [Tooltip("Set source ObjectID field name. This field is used for uniquely identifying the game objects.")]
     public string ObjectIDFieldName = "OBJECTID";
 
-    public bool Extrude = false;
-    public string ExtrudeField;
-    public float ExtrudeFactor;
-    [Tooltip("If the faces are not visible toggle this parameter")]
-    public bool InvertFaces;
+    //public bool Extrude = false;
+    //public string ExtrudeField;
+    //public float ExtrudeFactor;
+    //[Tooltip("If the faces are not visible toggle this parameter")]
+    //public bool InvertFaces = true;
 
     [MenuItem("GIS Tools/Import GeoJSON data")]
     private static void CreateWizard()
@@ -47,9 +47,9 @@ public class ImportGeoJSON : ScriptableWizard
 
             MapBounds bounds = features.bbox;
             bounds.ProjectToWebMercator();
-            bounds.SetScale(this.Scale);
+            bounds.SetScale(this.HorizontalScale);
 
-            this.UpdateCameraParameters(bounds.Center.ToVector3(), this.Scale);
+            this.UpdateCameraParameters(bounds.Center.ToVector3(), this.HorizontalScale, this.VerticalScale);
 
             foreach (FeatureObject ftr in features.features)
             {
@@ -62,7 +62,7 @@ public class ImportGeoJSON : ScriptableWizard
                 if (feature.Geometry.IsEmpty) continue;
 
                 feature.Geometry.ProjectToWebMercator();
-                feature.Geometry.SetScale(this.Scale);
+                feature.Geometry.SetScale(this.HorizontalScale);
 
                 Vector3 cityOrigin = feature.Geometry.GetCentroid();
 
@@ -74,12 +74,12 @@ public class ImportGeoJSON : ScriptableWizard
                 material.color = UnityEngine.Random.ColorHSV();
                 go.GetComponent<Renderer>().material = material;
 
-                if (this.Extrude)
-                {
-                    // TODO: get extrusion values from a field....
-                    // TODO: use this.ExtrusionFactor
-                    MeshExtrusion.Extrude(go, UnityEngine.Random.Range(1, 500), this.InvertFaces);
-                }
+                //if (this.Extrude)
+                //{
+                //    // TODO: get extrusion values from a field....
+                //    // TODO: use this.ExtrusionFactor
+                //    MeshExtrusion.Extrude(go, UnityEngine.Random.Range(1, 500), this.InvertFaces);
+                //}
             }
         }
         catch (Exception ex)
@@ -88,15 +88,16 @@ public class ImportGeoJSON : ScriptableWizard
         }
     }
 
-    private void UpdateCameraParameters(Vector3 origin, float scale)
+    private void UpdateCameraParameters(Vector3 origin, float horizontalScale, float verticalScale)
     {
         GameObject camera = GameObject.FindGameObjectWithTag("MainCamera") as GameObject;
 
         if (camera)
         {
-            MobileLook mobileLook = camera.GetComponent<MobileLook>() as MobileLook;
-            mobileLook.Origin = origin;
-            mobileLook.Scale = scale;
+            MapProperties prop = camera.GetComponent<MapProperties>() as MapProperties;
+            prop.HorizontalScale = horizontalScale;
+            prop.VerticalScale = verticalScale;
+            prop.Origin = origin;
         }
     }
 }
