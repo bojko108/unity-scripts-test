@@ -5,6 +5,9 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/mapreader.unity
     guid: a05a2213578b9f64eb99ff9961effe1b
+  - enabled: 1
+    path: Assets/Scenes/buildings.unity
+    guid: 0737f6efbe4a861419e5bf5a48129855

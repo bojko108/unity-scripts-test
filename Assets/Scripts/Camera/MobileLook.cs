@@ -57,7 +57,7 @@ public class MobileLook : MonoBehaviour
 
         // Y (height) will be equal to GPS height
         //TODO: add VeticalScale property for heights, simmilar for current property Scale
-        this.cameraContainer.transform.position = new Vector3(currentLocationVector.x - this.Origin.x, currentLocationVector.y - 500, currentLocationVector.z - this.Origin.z);
+        this.cameraContainer.transform.position = new Vector3(currentLocationVector.x - this.Origin.x, 1.8f/*currentLocationVector.y*/, currentLocationVector.z - this.Origin.z);
 
         #endregion
     }
