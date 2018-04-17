@@ -34,14 +34,14 @@ namespace Import
         public MapFeature(string fid)
         {
             this.FID = fid;
-            this.Attributes = new MapFeatureAttributes();
+            this.Attributes = new MapFeatureAttributes(new Dictionary<string, string>());
             this.Geometry = new MapFeatureGeometry(EnumGeometryType.Polygon);
         }
 
         public MapFeature(string fid, MapFeatureGeometry geometry)
         {
             this.FID = fid;
-            this.Attributes = new MapFeatureAttributes();
+            this.Attributes = new MapFeatureAttributes(new Dictionary<string, string>());
             this.Geometry = geometry;
         }
 
@@ -52,9 +52,9 @@ namespace Import
             this.Geometry = geometry;
         }
 
-        public void SetAttributes()
+        public void SetAttributes(Dictionary<string,string> attributes)
         {
-
+            this.Attributes.Add((attributes));
         }
 
         public void SetGeometry(EnumGeometryType type, List<Vertex> vertices)

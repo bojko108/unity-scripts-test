@@ -21,11 +21,15 @@ public class ImportGeoJSON : ScriptableWizard
     [Tooltip("Set source ObjectID field name. This field is used for uniquely identifying the game objects.")]
     public string ObjectIDFieldName = "OBJECTID";
 
-    //public bool Extrude = false;
-    //public string ExtrudeField;
-    //public float ExtrudeFactor;
-    //[Tooltip("If the faces are not visible toggle this parameter")]
-    //public bool InvertFaces = true;
+    [Tooltip("Extrude features during import")]
+    public bool Extrude = false;
+    [Tooltip("Set the extrude field in feature properties used for extrusion")]
+    public string ExtrudeField;
+    [Tooltip("Set extrude factor")]
+    [Range(0.1f, 10f)]
+    public float ExtrudeFactor = 1;
+    [Tooltip("If the faces are not visible toggle this parameter")]
+    public bool InvertFaces = true;
 
     [MenuItem("GIS Tools/Import GeoJSON data")]
     private static void CreateWizard()
@@ -57,6 +61,7 @@ public class ImportGeoJSON : ScriptableWizard
 
                 List<Vertex> vertices = ftr.geometry.AllPositions().ConvertAll((v) => new Vertex(v.latitude, v.longitude, 0.0));
 
+                feature.SetAttributes(ftr.properties);
                 feature.SetGeometry(EnumGeometryType.Polygon, vertices);
 
                 if (feature.Geometry.IsEmpty) continue;
@@ -71,15 +76,16 @@ public class ImportGeoJSON : ScriptableWizard
                 go.transform.parent = parentGameObject.transform;
 
                 Material material = new Material(Shader.Find("Standard"));
-                material.color = UnityEngine.Random.ColorHSV();
+                material.color = Color.gray;// UnityEngine.Random.ColorHSV();
                 go.GetComponent<Renderer>().material = material;
 
-                //if (this.Extrude)
-                //{
-                //    // TODO: get extrusion values from a field....
-                //    // TODO: use this.ExtrusionFactor
-                //    MeshExtrusion.Extrude(go, UnityEngine.Random.Range(1, 500), this.InvertFaces);
-                //}
+                if (this.Extrude)
+                {
+                    float height = feature.Attributes.Get<float>(this.ExtrudeField);
+                    height = height * this.ExtrudeFactor;
+
+                    MeshExtrusion.Extrude(go, height, this.InvertFaces);
+                }
             }
         }
         catch (Exception ex)

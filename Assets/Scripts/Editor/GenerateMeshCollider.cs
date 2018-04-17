@@ -6,8 +6,6 @@ using UnityEditor;
 
 public class GenerateMeshCollider : ScriptableWizard
 {
-    public GameObject GameObject;
-
     [MenuItem("Tools/Generate Mesh Collider")]
     private static void CreateWizard()
     {
@@ -16,9 +14,33 @@ public class GenerateMeshCollider : ScriptableWizard
 
     private void OnWizardCreate()
     {
+        foreach(Transform transform in Selection.transforms)
+        {
+            this.GenerateCollider(transform.gameObject);
+        }
+    }
+
+    private void GenerateCollider(GameObject gameObject)
+    {
         try
         {
-            MeshFilter[] meshFilters = this.GameObject.GetComponentsInChildren<MeshFilter>();
+            MeshCollider meshCollider = null;
+
+            if (gameObject.GetComponent<MeshCollider>() != null)
+            {
+                meshCollider = gameObject.transform.GetComponent<MeshCollider>();
+            }
+            else
+            {
+                meshCollider = gameObject.AddComponent(typeof(MeshCollider)) as MeshCollider;
+            }
+
+            if (meshCollider.sharedMesh == null)
+            {
+                meshCollider.sharedMesh = new Mesh();
+            }
+
+            MeshFilter[] meshFilters = gameObject.GetComponentsInChildren<MeshFilter>();
             CombineInstance[] combine = new CombineInstance[meshFilters.Length];
 
             int i = 0;
@@ -30,23 +52,17 @@ public class GenerateMeshCollider : ScriptableWizard
                 i++;
             }
 
-            MeshCollider meshCollider = null;
-
-            if (this.GameObject.GetComponent<MeshCollider>() != null)
+            if (combine.Length > 1)
             {
-                meshCollider = this.GameObject.transform.GetComponent<MeshCollider>();
+                meshCollider.sharedMesh.CombineMeshes(combine);
             }
             else
             {
-                meshCollider = this.GameObject.AddComponent(typeof(MeshCollider)) as MeshCollider;
+                if (meshFilters.Length > 0)
+                {
+                    meshCollider.sharedMesh = meshFilters[0].sharedMesh;
+                }
             }
-
-            if (meshCollider.sharedMesh == null)
-            {
-                meshCollider.sharedMesh = new Mesh();
-            }
-
-            meshCollider.sharedMesh.CombineMeshes(combine);
         }
         catch (Exception ex)
         {
