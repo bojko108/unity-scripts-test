@@ -96,14 +96,28 @@ public class ImportGeoJSON : ScriptableWizard
 
     private void UpdateCameraParameters(Vector3 origin, float horizontalScale, float verticalScale)
     {
-        GameObject camera = GameObject.FindGameObjectWithTag("MainCamera") as GameObject;
+        GameObject mapProperties = GameObject.FindGameObjectWithTag(MapProperties.TAG);
 
-        if (camera)
+        if (mapProperties == null)
         {
-            MapProperties prop = camera.GetComponent<MapProperties>() as MapProperties;
-            prop.HorizontalScale = horizontalScale;
-            prop.VerticalScale = verticalScale;
-            prop.Origin = origin;
+            mapProperties = new GameObject("Map Properties");
+            mapProperties.tag = MapProperties.TAG;
+            mapProperties.AddComponent<MapProperties>();
         }
+
+        MapProperties prop = mapProperties.GetComponent<MapProperties>() as MapProperties;
+        prop.HorizontalScale = horizontalScale;
+        prop.VerticalScale = verticalScale;
+        prop.Origin = origin;
+
+        //GameObject camera = GameObject.FindGameObjectWithTag("MainCamera") as GameObject;
+
+        //if (camera)
+        //{
+        //    MapProperties prop = camera.GetComponent<MapProperties>() as MapProperties;
+        //    prop.HorizontalScale = horizontalScale;
+        //    prop.VerticalScale = verticalScale;
+        //    prop.Origin = origin;
+        //}
     }
 }

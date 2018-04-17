@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class MapProperties : MonoBehaviour
 {
+    public static string TAG = "MapProperties";
+
     [Tooltip("Set the horizotnal scale for imported data. By default the horizotnal scale is 1:1, if you need for example scale 1:1000, set this parameter to 1000.")]
     public float HorizontalScale;
     [Tooltip("Set the vertical scale for imported data. By default the scale is 1:1, if you need for example scale 1:10, set this parameter to 10.")]

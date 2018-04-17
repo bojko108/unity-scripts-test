@@ -10,8 +10,9 @@ public class MobileLook : MonoBehaviour
     private bool gyroscopeEnabled;
     private Gyroscope gyroscope;
 
-    private GameObject cameraContainer;
+    private GameObject mapPropertiesGO;
     private MapProperties mapProperties;
+    private GameObject cameraContainer;
 
     private void Start()
     {
@@ -22,7 +23,8 @@ public class MobileLook : MonoBehaviour
         // add GPS script
         this.gps = this.cameraContainer.AddComponent<GPS>();
         // get Map Properties: scale and origin...
-        this.mapProperties = this.GetComponent<MapProperties>() as MapProperties;
+        this.mapPropertiesGO = GameObject.FindGameObjectWithTag(MapProperties.TAG);
+        this.mapProperties = this.mapPropertiesGO.GetComponent<MapProperties>() as MapProperties;
 
         // set initial rotation
         this.cameraContainer.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
